@@ -5,12 +5,13 @@ import { ProductCard } from "../../../widget/Card/ProductCard";
 import { CartItem, Tree } from "../../../types/types";
 import { MessageCircle } from "lucide-react";
 import { ContactForm } from "../../../widget/Forms/ContactForm";
+import { ProductCart } from "../../../widget/Cart/ProductCart";
 
 export const MainPage = () => {
   const { data: trees, isLoading, error } = useGetTreesQuery();
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [isConcactOpen, setIsContactOpen] = useState(true);
+  const [isConcactOpen, setIsContactOpen] = useState(false);
 
   const addToCart = (tree: Tree) => {
     setCartItems((prev) => {
@@ -45,9 +46,14 @@ export const MainPage = () => {
     setIsContactOpen(false);
   };
 
+  const itemsCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
   return (
     <div className="min-h-screen bg-gray-50 ">
-      <Header />
+      <Header
+        cartItemsCount={itemsCount}
+        onCartClick={() => setIsCartOpen(true)}
+      />
       <main className="container mx-auto px-4 py-8">
         <h2 className="text-3xl font-bold text-gray-800 mb-8">Collection</h2>
         {isLoading ? (
@@ -103,7 +109,15 @@ export const MainPage = () => {
         </div>
       )}
 
-      {isCartOpen}
+      {isCartOpen && (
+        <ProductCart
+          items={cartItems}
+          onClose={() => setIsCartOpen(false)}
+          onUpdateQuantity={updateQuantity}
+          onCheckout={handleCheckout}
+          onRemoveItem={removeItem}
+        />
+      )}
     </div>
   );
 };
